@@ -3,10 +3,12 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "aabb.h"
+
 #define PLAYER_WIDTH 40.0f
 #define PLAYER_HEIGHT 40.0f
 
-void UpdatePlayer(Player *player, float deltaTime) {
+void UpdatePlayer(Player *player, Walls *walls, float deltaTime) {
     assert(player != NULL);
 
     Vector2 translation = {0.0f, 0.0f};
@@ -23,14 +25,34 @@ void UpdatePlayer(Player *player, float deltaTime) {
         translation.y = 1.0f;
     }
 
-    player->position = Vector2Add(player->position, Vector2Scale(Vector2Normalize(translation), player->speed * deltaTime));
-}
+    translation = Vector2Scale(Vector2Normalize(translation), player->speed * deltaTime);
 
-void DrawPlayer(Player *player) {
-    Rectangle playerRect = { 
-        player->position.x - (PLAYER_WIDTH / 2), 
-        player->position.y - (PLAYER_HEIGHT / 2), 
+    for (int i = 0; i < walls->count; ++i) {
+        if (aabb_collision(
+            (Rectangle) { 
+                player->position.x + translation.x, 
+                player->position.y + translation.y, 
+                PLAYER_WIDTH, PLAYER_HEIGHT 
+            },
+            (Rectangle) {
+                walls->positions[i].x, 
+                walls->positions[i].y, 
+                WALL_WIDTH, WALL_HEIGHT 
+            }
+        )) {
+            return;
+        }
+    }
+
+    player->position = Vector2Add(player->position, translation);
+
+    player->rect = (Rectangle){ 
+        player->position.x, 
+        player->position.y, 
         PLAYER_WIDTH, PLAYER_HEIGHT 
     };
-    DrawRectangleRec(playerRect, RED);
+}
+
+void DrawPlayer(Player *player) {    
+    DrawRectangleRec(player->rect, RED);
 }
