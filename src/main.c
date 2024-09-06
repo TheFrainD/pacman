@@ -2,21 +2,41 @@
 
 #include <raylib.h>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#include "node.h"
+
+#define WINDOW_WIDTH 240
+#define WINDOW_HEIGHT 320
 #define WINDOW_TITLE "Pacman"
+
+NodeGroup *nodeGroup;
+
+void Update(float deltaTime) {
+
+}
+
+void Draw() {
+    NodeGroupDraw(nodeGroup);
+}
 
 int main(int argc, char **argv) {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
 
+    nodeGroup = NodeGroupCreate();
+
     while (!WindowShouldClose()) {
+        float deltaTime = GetFrameTime();
+
+        Update(deltaTime);
+
         BeginDrawing();
-        
         ClearBackground(RAYWHITE);
-        DrawText("Hello, Pacman!", 330, 270, 20, BLACK);
+        
+        Draw();
 
         EndDrawing();
     }
+
+    NodeGroupFree(&nodeGroup);
 
     CloseWindow();
 
