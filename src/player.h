@@ -7,6 +7,7 @@
 
 typedef struct Player {
     Vector2 position;
+    Vector2 direction;
     float speed;
     Rectangle rect;
 } Player;

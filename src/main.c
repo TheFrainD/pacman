@@ -82,6 +82,7 @@ int main(int argc, char **argv) {
     }
 
     player.speed = 100.0f;
+    player.direction = (Vector2){ -1.0f, 0.0f };
 
     SetTargetFPS(60);
 

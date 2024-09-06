@@ -11,22 +11,19 @@
 void UpdatePlayer(Player *player, Walls *walls, float deltaTime) {
     assert(player != NULL);
 
-    Vector2 translation = {0.0f, 0.0f};
-
     if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
-        translation.x = -1.0f;
+        player->direction = (Vector2){ -1.0f, 0.0f };
     } else if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-        translation.x = 1.0f;
-    }
-
-    if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
-        translation.y = -1.0f;
+        player->direction = (Vector2){ 1.0f, 0.0f };
+    } else if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
+        player->direction = (Vector2){ 0.0f, -1.0f };
     } else if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
-        translation.y = 1.0f;
+        player->direction = (Vector2){ 0.0f, 1.0f };
     }
 
-    translation = Vector2Scale(Vector2Normalize(translation), player->speed * deltaTime);
+    Vector2 translation = Vector2Scale(player->direction, player->speed * deltaTime);
 
+    bool collision = false;
     for (int i = 0; i < walls->count; ++i) {
         if (aabb_collision(
             (Rectangle) { 
@@ -40,12 +37,15 @@ void UpdatePlayer(Player *player, Walls *walls, float deltaTime) {
                 WALL_WIDTH, WALL_HEIGHT 
             }
         )) {
-            return;
+            collision = true;
+            break;
         }
     }
 
-    player->position = Vector2Add(player->position, translation);
-
+    if (!collision) {
+        player->position = Vector2Add(player->position, translation);
+    }
+    
     player->rect = (Rectangle){ 
         player->position.x, 
         player->position.y, 
